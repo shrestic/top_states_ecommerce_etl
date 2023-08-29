@@ -3,9 +3,12 @@ For our project we will assume we work for a user behavior analytics company tha
    1. Purchase data from an OLTP database
    2. Movie review data from a 3rd party data vendor (we simulate this by using a file and assuming its from a data vendor)
 
+<img width="741" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/6022ae6a-7a4d-4ddc-b0ea-682919408d53">
+
+
 The goal is to provide a joined dataset of the 2 datasets above, in our analytics (OLAP) database every day, to be used by analysts, dashboard software, etc.
 
-<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/83756194-bf61-4d03-9682-5e65660830f6">
+<img width="718" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/9ec555a6-79c9-4721-9c8b-a9a285c5a926">
 
 
 ## ETL Design
@@ -19,7 +22,8 @@ Check document: https://airflow.apache.org/docs/apache-airflow/stable/templates-
 
 For ease of implementation and testing, we will build our data pipeline in stages. There are 3 stages and these 3 stages shown below
 
-<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/8fef0d07-05c7-4aec-ac89-4d38ecd4a190">
+<img width="724" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/08408841-0028-4ef6-a733-0b490fff1a46">
+
 
 * ### Stage 1. Postgres -> File -> S3 Bucket
 Since we are not dealing with a lot of data we can use or  Airflow metadata database as our "fake" datastore as well.
@@ -92,9 +96,6 @@ extract_user_purchase_data = SQLExecuteQueryOperator(
 It’s not always a good pattern to store the entire dataset in our local filesystem. Since we could get an out-of-memory error if our dataset is too large. 
 Ideally you will have your configs in a different file or set them as docker env variables, but due to this being a simple example we keep them with the DAG script.
 
-You can verify that your code is working by going to the airflow UI at localhost:8080 and clicking on the dag and task and render as shown below
-
-<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/3b6d75b5-4ce1-4a48-a290-c898dbc82923">
 
 You will see that the {{ }} template in your SQL script will have been replaced by parameters set in the DAG at user_behaviour.py.
 For the next task lets upload this file to our S3 bucket. But before upload, we gonna create file call utils.py and define a helper function to help we push file from local to s3 bucket
@@ -389,8 +390,6 @@ In the above script there are 4 main steps
     4.Create a table user_behavior_metric which is our final goal.
     
 We have the movie review and user purchase data cleaned and ready in the staging S3 location. We need to enable airflow to connect to our redshift database.
-
-<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/22ec1524-3666-432e-9a7c-b517b9203729">
 
 Once we have the connection established, we need update `utils.py` file then let the `user_purchase_staging` table know that a new partition has been added. We can do that on our DAG as shown below.
 
