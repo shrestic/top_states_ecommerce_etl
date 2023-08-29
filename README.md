@@ -442,9 +442,11 @@ get_user_behaviour = PostgresOperator(
 )
 ```
  Verify that it completes successfully from the Airflow UI and Redshift Editor
- <img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/138aecb2-a254-4516-bd2c-5281ded0e254">
+ 
+<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/477e82ae-8437-409b-b2dc-fb5976611353">
 
- <img width="1511" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/5e049f87-9f19-4679-b78b-848f8c5f9636">
+<img width="500" alt="image" src="https://github.com/nhatphongcgp/batch-processing-project/assets/60643737/b77da8a0-092e-41c8-9d83-c0676c97f387">
+
 
 
  
