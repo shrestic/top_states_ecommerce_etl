@@ -220,7 +220,8 @@ The first step uses s3-dist-cp (https://docs.aws.amazon.com/emr/latest/ReleaseGu
 
 Create a python file at beginner_de_project/dags/scripts/spark/random_text_classification.py with the following content
 
-P/s: It's a simple spark script to clean text data (tokenize and remove stop words) and use a naive classification heuristic to classify if a review is positive or not. I'm not very familiar with ML so I consulted some documents and links:
+P/s: It's a simple spark script to clean text data (tokenize and remove stop words) and use a naive classification heuristic to classify if a review is positive or not. 
+Some documents and links:
 
 https://www.youtube.com/watch?v=eAhZsAMWWsA
 
