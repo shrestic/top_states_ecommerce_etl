@@ -1,6 +1,5 @@
 from airflow import DAG
 from airflow.models import Variable
-from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
@@ -33,7 +32,7 @@ default_args = {
 }
 
 dag = DAG(
-    "user_behaviour",
+    "user_behavior",
     default_args=default_args,
     schedule_interval="0 0 * * *",
     start_date=datetime(2010, 12, 1),
@@ -47,6 +46,7 @@ empty_task = EmptyOperator(task_id='empty_task')
 extract_user_purchase_data = SQLExecuteQueryOperator(
     dag=dag,
     task_id='extract_user_purchase_data',
+    database='airflow',
     sql=unload_user_purchase,
     conn_id='postgres_default',
     params={'user_purchase': "/temp/user_purchase.csv"},
@@ -100,7 +100,6 @@ start_emr_movie_classification_script = EmrAddStepsOperator(
     params={
         "BUCKET_NAME": BUCKET_NAME,
         "raw_movie_review": "raw/movie_review",
-        "text_classifier_script": "scripts/random_text_classifier.py",
         "stage_movie_review": "stage/movie_review",
     },
     depends_on_past=True,
@@ -148,15 +147,16 @@ user_purchase_to_rs_stage = PythonOperator(
     },
 )
 
-get_user_behaviour = PostgresOperator(
+get_user_behavior = SQLExecuteQueryOperator(
+    database='dev',
     dag=dag,
-    task_id='get_user_behaviour',
+    task_id='get_user_behavior',
     sql='scripts/sql/get_user_behavior_metrics.sql',
-    postgres_conn_id='redshift-conn-id'
+    conn_id='redshift-conn-id'
 )
 
 
 (extract_user_purchase_data >> user_purchase_to_stage_data_lake >> user_purchase_to_rs_stage)
 ([movie_review_to_raw_data_lake, spark_script_to_s3] >> start_emr_movie_classification_script >> wait_for_movie_classification_transformation)
-([user_purchase_to_rs_stage, wait_for_movie_classification_transformation] >> get_user_behaviour)
+([user_purchase_to_rs_stage, wait_for_movie_classification_transformation] >> get_user_behavior)
 

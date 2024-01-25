@@ -23,7 +23,7 @@ def local_to_s3(
             
 
 def run_redshift_external_query(qry: str) -> None:
-    rs_hook = PostgresHook(postgres_conn_id="redshift-conn-id")
+    rs_hook = PostgresHook(postgres_conn_id="redshift-conn-id",database="dev")
     rs_conn = rs_hook.get_conn()
     rs_conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     rs_cursor = rs_conn.cursor()

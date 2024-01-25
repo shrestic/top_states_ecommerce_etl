@@ -1,3 +1,5 @@
+DROP SCHEMA IF EXISTS retail CASCADE;
+
 CREATE SCHEMA retail;
 
 CREATE TABLE retail.user_purchase (

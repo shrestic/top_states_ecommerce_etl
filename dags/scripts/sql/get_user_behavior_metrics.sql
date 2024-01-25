@@ -1,13 +1,13 @@
 DELETE FROM public.user_behavior_metric
 WHERE insert_date = '{{ ds }}';
 INSERT INTO public.user_behavior_metric (
-        customerid,
+        customer_id,
         amount_spent,
         review_score,
         review_count,
         insert_date
     )
-SELECT ups.customerid,
+SELECT ups.customer_id,
     CAST(
         SUM(ups.Quantity * ups.UnitPrice) AS DECIMAL(18, 5)
     ) AS amount_spent,
@@ -23,6 +23,6 @@ FROM spectrum.user_purchase_staging ups
             END AS positive_review
         FROM spectrum.classified_movie_review
         WHERE insert_date = '{{ ds }}'
-    ) mrcs ON ups.customerid = mrcs.cid
+    ) mrcs ON ups.customer_id = mrcs.cid
 WHERE ups.insert_date = '{{ ds }}'
-GROUP BY ups.customerid;
+GROUP BY ups.customer_id;

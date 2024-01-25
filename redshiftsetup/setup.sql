@@ -8,7 +8,7 @@ CREATE EXTERNAL TABLE spectrum.user_purchase_staging (
     Quantity INTEGER,
     InvoiceDate TIMESTAMP,
     UnitPrice DECIMAL(8, 3),
-    customerid INTEGER,
+    customer_id INTEGER,
     Country VARCHAR(20)
 ) PARTITIONED BY (insert_date DATE) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS textfile LOCATION 's3://"$1"/stage/user_purchase/' TABLE PROPERTIES ('skip.header.line.count' = '1');
 DROP TABLE IF EXISTS spectrum.classified_movie_review;
@@ -19,7 +19,7 @@ CREATE EXTERNAL TABLE spectrum.classified_movie_review (
 ) STORED AS PARQUET LOCATION 's3://"$1"/stage/movie_review/';
 DROP TABLE IF EXISTS public.user_behavior_metric;
 CREATE TABLE public.user_behavior_metric (
-    customerid INTEGER,
+    customer_id INTEGER,
     amount_spent DECIMAL(18, 5),
     review_score INTEGER,
     review_count INTEGER,
