@@ -54,11 +54,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./tests:/opt/airflow/tests
-    - ./data:/opt/airflow/data
-    - ./temp:/opt/airflow/temp
-    - ./migrations:/opt/airflow/migrations
-    - ./spectrum_tables:/opt/airflow/spectrum_tables
+
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     postgres:
@@ -73,10 +69,10 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - ./data:/input_data
-      - ./temp:/temp
-      - ./pgsetup:/docker-entrypoint-initdb.d
-      - ./spectrum_tables:/opt/airflow/spectrum_tables
+      - ./plugins/data:/input_data
+      - ./plugins/temp:/temp
+      - ./src/pgsetup:/docker-entrypoint-initdb.d
+
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "airflow" ]
       interval: 5s

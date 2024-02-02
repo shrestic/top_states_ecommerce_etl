@@ -6,5 +6,10 @@
         "spectrumdb",
         "textfile",
         "xcom"
+    ],
+    "python.analysis.extraPaths": [
+        "./utilities",
+        "./src",
+        "./plugins/utilities"
     ]
 }

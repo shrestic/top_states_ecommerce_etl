@@ -30,17 +30,3 @@ def run_redshift_external_query(qry: str) -> None:
     rs_cursor.execute(qry)
     rs_cursor.close()
     rs_conn.commit()
-    
-'''
-The get_conn() method of the PostgresHook object is used to get a connection to the Redshift database.
-
-The set_isolation_level() method of the connection object is used to set the isolation level to AUTOCOMMIT. This means that each SQL statement will be committed automatically after it is executed.
-
-The cursor() method of the connection object is used to create a cursor object. The cursor object is used to execute SQL statements.
-
-The execute() method of the cursor object is used to execute the SQL query.
-
-The close() method of the cursor object is used to close the cursor object.
-
-The commit() method of the connection object is used to commit the changes made to the database.
-'''
