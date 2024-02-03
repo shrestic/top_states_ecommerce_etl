@@ -1,44 +1,50 @@
 from datetime import datetime, timedelta
-from etl.extract.extract import extract_users_pg, extract_orders_pg
-from airflow.decorators import dag, task_group
-from airflow.operators.python import PythonOperator
-# Config
-# BUCKET_NAME = Variable.get("BUCKET")
-# EMR_ID = Variable.get("EMR_ID")
-# EMR_STEPS = {}
-# with open("path") as json_file:
-#     EMR_STEPS = json.load(json_file)
+from airflow import DAG
+from etl.extract.extract import extract_orders, extract_users
+from airflow.decorators import task_group
+from etl.transform.transform import (
+    trigger_transform_data,
+    upload_process_script,
+    crawler_data,
+    crawler_sensor,
+    wait_for_transformation_data,
+)
 
 default_args = {
     "owner": "airflow",
     "depends_on_past": True,
-    'wait_for_downstream': True,
+    "wait_for_downstream": True,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5)
+    "retry_delay": timedelta(minutes=5),
 }
 
 
-@dag(dag_id='user_behavior_etl',
-     schedule_interval="@daily",
-     start_date=datetime(2019, 1, 5),
-     max_active_runs=1, default_args=default_args,
-     catchup=True)
-def user_behavior_etl():
-    @task_group(group_id='extract')
-    def extract():
+with DAG(
+    dag_id="user_behavior_etl",
+    schedule_interval="@daily",
+    start_date=datetime(2019, 1, 6),
+    max_active_runs=1,
+    default_args=default_args,
+    catchup=True,
+) as dag:
 
-        extract_users = PythonOperator(
-            task_id='extract_users',
-            python_callable=extract_users_pg
-        )
+    def user_behavior_etl():
+        @task_group(group_id="extract", dag=dag)
+        def extract():
+            extract_users(dag)
+            extract_orders(dag)
 
-        extract_orders = PythonOperator(
-            task_id='extract_orders',
-            python_callable=extract_orders_pg,
-            op_kwargs={"date": "{{ data_interval_start }}"},
-        )
+        @task_group(group_id="transform", dag=dag)
+        def transform():
+            upload_process_script(dag)
+            (
+                crawler_data(dag)
+                >> crawler_sensor(dag)
+                >> trigger_transform_data(dag)
+                >> wait_for_transformation_data(dag)
+            )
 
-    extract()
+        extract() >> transform()
 
 
-dag = user_behavior_etl()
+user_behavior_etl()

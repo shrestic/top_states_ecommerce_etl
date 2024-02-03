@@ -1,0 +1,14 @@
+[
+    {
+      "Name": "Transform Data",
+      "ActionOnFailure": "CANCEL_AND_WAIT",
+      "HadoopJarStep": {
+        "Jar": "command-runner.jar",
+        "Args": [
+          "spark-submit",
+          "s3://{{ params.BUCKET_NAME }}/scripts/process_transform_script.py",
+          "--bucket_name={{ params.BUCKET_NAME }}"
+        ]
+      }
+    }
+  ]

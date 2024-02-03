@@ -2,6 +2,7 @@ import os
 import psycopg2
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.providers.amazon.aws.operators.glue_crawler import GlueCrawlerHook
 
 
 def local_to_s3(
@@ -44,3 +45,25 @@ def export_postgres_to_csv(sql, file) -> None:
     )
     pg_cursor.close()
     pg_conn.commit()
+
+
+def create_crawler(name, role, database_name, path_s3):
+    crawler_hook = GlueCrawlerHook(aws_conn_id="aws-conn-id")
+    if not crawler_hook.has_crawler(name):
+        crawler_hook.create_crawler(
+            Name=name,
+            Role=role,
+            DatabaseName=database_name,
+            Targets={
+                'S3Targets': [
+                    {
+                        'Path': path_s3,
+                    },
+                ]
+            },
+        )
+
+
+def start_crawler(name):
+    crawler_hook = GlueCrawlerHook(aws_conn_id="aws-conn-id")
+    crawler_hook.start_crawler(name)

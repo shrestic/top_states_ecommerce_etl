@@ -1,14 +1,18 @@
 COPY (
     SELECT id,
-        order_id,
-        user_id,
-        product_id,
-        inventory_item_id,
-        status,
-        created_at,
-        shipped_at,
-        delivered_at,
-        returned_at,
-        sale_price
-    FROM public.orders;
+        first_name,
+        last_name,
+        email,
+        age,
+        gender,
+        state,
+        street_address,
+        postal_code,
+        city,
+        country,
+        latitude,
+        longitude,
+        traffic_source,
+        to_date(cast(created_at as TEXT),'YYYY-MM-DD') as created_at
+    FROM users
 ) TO STDOUT WITH (FORMAT CSV, HEADER);

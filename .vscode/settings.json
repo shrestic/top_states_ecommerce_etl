@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
+        "boto",
         "HDFS",
+        "metastore",
         "mrcs",
         "psycopg",
         "spectrumdb",
