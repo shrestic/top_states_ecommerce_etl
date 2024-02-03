@@ -70,8 +70,6 @@ services:
       POSTGRES_DB: airflow
     volumes:
       - ./plugins/data:/input_data
-      - ./plugins/temp:/temp
-      - ./src/pgsetup:/docker-entrypoint-initdb.d
 
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "airflow" ]

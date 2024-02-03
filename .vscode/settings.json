@@ -10,6 +10,7 @@
     "python.analysis.extraPaths": [
         "./utilities",
         "./src",
-        "./plugins/utilities"
+        "./plugins/utilities",
+        "./plugins"
     ]
 }

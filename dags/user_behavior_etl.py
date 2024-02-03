@@ -1,13 +1,7 @@
-from airflow import DAG
-from airflow.models import Variable
-from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
-from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from airflow.operators.empty import EmptyOperator
-from utils import local_to_s3, run_redshift_external_query
-from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator
-from airflow.providers.amazon.aws.sensors.emr import EmrStepSensor
-
+from etl.extract.extract import extract_users_pg, extract_orders_pg
+from airflow.decorators import dag, task_group
+from airflow.operators.python import PythonOperator
 # Config
 # BUCKET_NAME = Variable.get("BUCKET")
 # EMR_ID = Variable.get("EMR_ID")
@@ -23,13 +17,28 @@ default_args = {
     "retry_delay": timedelta(minutes=5)
 }
 
-dag = DAG(
-    "user_behavior",
-    default_args=default_args,
-    schedule_interval="0 0 * * *",
-    start_date=datetime(2010, 12, 1),
-    max_active_runs=1
-)
 
-empty_task = EmptyOperator(task_id='empty_task')
+@dag(dag_id='user_behavior_etl',
+     schedule_interval="@daily",
+     start_date=datetime(2019, 1, 5),
+     max_active_runs=1, default_args=default_args,
+     catchup=True)
+def user_behavior_etl():
+    @task_group(group_id='extract')
+    def extract():
 
+        extract_users = PythonOperator(
+            task_id='extract_users',
+            python_callable=extract_users_pg
+        )
+
+        extract_orders = PythonOperator(
+            task_id='extract_orders',
+            python_callable=extract_orders_pg,
+            op_kwargs={"date": "{{ data_interval_start }}"},
+        )
+
+    extract()
+
+
+dag = user_behavior_etl()
