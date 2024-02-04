@@ -7,8 +7,6 @@ from airflow.providers.amazon.aws.sensors.glue_crawler import GlueCrawlerSensor
 from airflow.providers.amazon.aws.sensors.emr import EmrStepSensor
 
 
-AWS_ACCESS_KEY_ID = Variable.get("ACCESS_ID")
-AWS_SECRET_ACCESS_KEY = Variable.get("ACCESS_KEY")
 BUCKET_NAME = Variable.get("BUCKET_NAME")
 EMR_ID = Variable.get("EMR_ID")
 EMR_STEPS = {}
@@ -81,8 +79,6 @@ def wait_for_transformation_data(dag):
         aws_conn_id="aws-conn-id",
         task_id="wait_for_transformation_data",
         job_flow_id=EMR_ID,
-        step_id='{{ task_instance.xcom_pull("trigger_transform_data", key="return_value")['
-        + str(len(EMR_STEPS) - 1)
-        + "] }}",
+        step_id="{{ task_instance.xcom_pull('transform.trigger_transform_data', key='return_value')[0] }}",
         depends_on_past=True,
     )
