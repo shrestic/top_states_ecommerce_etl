@@ -5,6 +5,7 @@
         "metastore",
         "mrcs",
         "psycopg",
+        "searchpath",
         "spectrumdb",
         "textfile",
         "xcom"

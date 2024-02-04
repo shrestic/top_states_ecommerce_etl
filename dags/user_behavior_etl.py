@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from etl.extract.extract import extract_orders, extract_users
 from airflow.decorators import task_group
+from etl.load.load import get_user_behavior_data
 from etl.transform.transform import (
     trigger_transform_data,
     upload_process_script,
@@ -25,6 +26,7 @@ with DAG(
     start_date=datetime(2019, 1, 6),
     max_active_runs=1,
     default_args=default_args,
+    template_searchpath='plugins/scripts/sql',
     catchup=True,
 ) as dag:
 
@@ -44,7 +46,10 @@ with DAG(
                 >> wait_for_transformation_data(dag)
             )
 
-        extract() >> transform()
+        @task_group(group_id="load", dag=dag)
+        def load():
+            get_user_behavior_data(dag)
 
+        extract() >> transform() >> load()
 
 user_behavior_etl()
