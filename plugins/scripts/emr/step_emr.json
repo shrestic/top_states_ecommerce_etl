@@ -1,14 +1,26 @@
 [
-    {
-      "Name": "Transform Data",
-      "ActionOnFailure": "CANCEL_AND_WAIT",
-      "HadoopJarStep": {
-        "Jar": "command-runner.jar",
-        "Args": [
-          "spark-submit",
-          "s3://{{ params.BUCKET_NAME }}/scripts/process_transform_script.py",
-          "--bucket_name={{ params.BUCKET_NAME }}"
-        ]
-      }
+  {
+    "Name": "Move raw data from S3 to HDFS",
+    "ActionOnFailure": "CANCEL_AND_WAIT",
+    "HadoopJarStep": {
+      "Jar": "command-runner.jar",
+      "Args": [
+        "s3-dist-cp",
+        "--src=s3://{{ params.BUCKET_NAME }}/raw-data/",
+        "--dest=/raw-data-stage"
+      ]
     }
-  ]
+  },
+  {
+    "Name": "Transform Data",
+    "ActionOnFailure": "CANCEL_AND_WAIT",
+    "HadoopJarStep": {
+      "Jar": "command-runner.jar",
+      "Args": [
+        "spark-submit",
+        "s3://{{ params.BUCKET_NAME }}/scripts/process_transform_script.py",
+        "--bucket_name={{ params.BUCKET_NAME }}"
+      ]
+    }
+  }
+]

@@ -24,53 +24,50 @@ sql_user_query = """COPY (
 ) TO STDOUT WITH (FORMAT CSV, HEADER);"""
 
 sql_order_query = """COPY (
-    SELECT id,
-        order_id,
+    SELECT order_id,
         user_id,
-        product_id,
-        inventory_item_id,
         status,
-        to_date(cast(created_at as TEXT),'YYYY-MM-DD') as created_at,
-        to_date(cast(shipped_at as TEXT),'YYYY-MM-DD') as shipped_at,
-        to_date(cast(delivered_at as TEXT),'YYYY-MM-DD') as delivered_at,
-        to_date(cast(returned_at as TEXT),'YYYY-MM-DD') as returned_at,
-        sale_price
+        gender,
+        created_at,
+        returned_at,
+        shipped_at,
+        delivered_at,
+        num_of_item
     FROM public.orders
-    WHERE to_date(cast(created_at as TEXT),'YYYY-MM-DD') = {start_date}
+    WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', TIMESTAMP {start_date}) 
     ORDER BY created_at
 ) TO STDOUT WITH (FORMAT CSV, HEADER);"""
 
-BUCKET_NAME = Variable.get('BUCKET_NAME')
+BUCKET_NAME = Variable.get("BUCKET_NAME")
 
 
 def extract_users_data_pg():
-    export_postgres_to_csv(sql=sql_user_query, file=open(
-        'plugins/data/users.csv', 'w'))
+    export_postgres_to_csv(sql=sql_user_query, file=open("plugins/data/users.csv", "w"))
     local_to_s3(
         bucket_name=BUCKET_NAME,
-        key="raw_data/user/users.csv",
+        key="raw-data/user/users.csv",
         file_name="plugins/data/users.csv",
-        remove_local=True
+        remove_local=True,
     )
 
 
 def extract_orders_data_pg(date: str):
-    export_postgres_to_csv(sql=sql.SQL(sql_order_query).format(start_date=sql.Literal(date)),
-                           file=open('plugins/data/orders.csv', 'w')),
-    date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z")
+    export_postgres_to_csv(
+        sql=sql.SQL(sql_order_query).format(start_date=sql.Literal(date)),
+        file=open("plugins/data/orders.csv", "w"),
+    ),
+    date_converted = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d")
     local_to_s3(
         bucket_name=BUCKET_NAME,
-        key="raw_data/order/date=" +
-            str(date_obj.strftime("%Y-%m-%d")) + "/orders.csv",
+        key="raw-data/order/" + str(date_converted) + ".csv",
         file_name="plugins/data/orders.csv",
-        remove_local=True
+        remove_local=True,
     )
 
 
 def extract_users(dag):
     return PythonOperator(
-        dag=dag,
-        task_id="extract_users", python_callable=extract_users_data_pg
+        dag=dag, task_id="extract_users", python_callable=extract_users_data_pg
     )
 
 

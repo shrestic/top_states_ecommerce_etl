@@ -2,13 +2,11 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from etl.extract.extract import extract_orders, extract_users
 from airflow.decorators import task_group
-from etl.load.load import get_user_behavior_data
+from etl.load.load import get_states_user_order_data
 from etl.transform.transform import (
     trigger_transform_data,
     upload_process_script,
-    crawler_data,
-    crawler_sensor,
-    wait_for_transformation_data,
+    wait_for_transformation_data
 )
 
 default_args = {
@@ -21,16 +19,16 @@ default_args = {
 
 
 with DAG(
-    dag_id="user_behavior_etl",
-    schedule_interval="@daily",
+    dag_id="state_user_order_etl",
+    schedule_interval="@monthly",
     start_date=datetime(2019, 1, 6),
     max_active_runs=1,
     default_args=default_args,
-    template_searchpath='plugins/scripts/sql',
+    template_searchpath="plugins/scripts/sql",
     catchup=True,
 ) as dag:
 
-    def user_behavior_etl():
+    def state_user_order_etl():
         @task_group(group_id="extract", dag=dag)
         def extract():
             extract_users(dag)
@@ -38,18 +36,17 @@ with DAG(
 
         @task_group(group_id="transform", dag=dag)
         def transform():
-            upload_process_script(dag)
             (
-                crawler_data(dag)
-                >> crawler_sensor(dag)
+                upload_process_script(dag)
                 >> trigger_transform_data(dag)
                 >> wait_for_transformation_data(dag)
             )
 
         @task_group(group_id="load", dag=dag)
         def load():
-            get_user_behavior_data(dag)
+            get_states_user_order_data(dag)
 
         extract() >> transform() >> load()
 
-user_behavior_etl()
+
+state_user_order_etl()

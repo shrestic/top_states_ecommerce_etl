@@ -8,6 +8,7 @@
         "searchpath",
         "spectrumdb",
         "textfile",
+        "TRUNC",
         "xcom"
     ],
     "python.analysis.extraPaths": [
