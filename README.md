@@ -1,5 +1,5 @@
 # Project Overview
-The project builds an ETL pipeline to collect e-commerce data from different data sources and joins them together to identify the top states with the most users and orders.
+The project builds an ETL pipeline to collect e-commerce data from different data sources and joins them together to identify the top states in US with the most users and orders.
 ## Airflow Graph Design
  * This pipeline is scheduled to run on a monthly basis.
 ![Screenshot 2024-02-05 at 18 23 12](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/0e82bc93-fbba-4d1f-916f-c6524e93b746)
@@ -213,7 +213,8 @@ def get_states_user_order_data(dag):
     )
 ```
 ## Visualize
-![image](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/40ad769d-1e7a-491e-b2b7-ce928e2aa896)
+![image](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/064510a7-6099-46cc-b400-458faecf8780)
+
 
 
 ## Authors
