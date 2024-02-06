@@ -212,6 +212,8 @@ def get_states_user_order_data(dag):
         conn_id='redshift-conn-id'
     )
 ```
+## Visualize
+![image](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/40ad769d-1e7a-491e-b2b7-ce928e2aa896)
 
 
 ## Authors
