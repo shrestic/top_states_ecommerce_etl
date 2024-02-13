@@ -4,6 +4,7 @@ The project builds an ETL pipeline to collect e-commerce data from different dat
  * This pipeline is scheduled to run on a monthly basis.
 ![Screenshot 2024-02-05 at 18 23 12](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/0e82bc93-fbba-4d1f-916f-c6524e93b746)
 ## ETL Design
+![design](https://github.com/shrestic/top_states_ecommerce_etl/assets/60643737/2a75615c-8acb-4b86-8168-e170a52801b2)
 ### Extract 
 * The `extract.py` file
 ```python
